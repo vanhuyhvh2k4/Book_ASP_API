@@ -19,6 +19,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // Register Interfaces
 builder.Services.AddScoped<IReaderRepository, ReaderRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

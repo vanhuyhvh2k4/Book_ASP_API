@@ -10,6 +10,9 @@ namespace BookManagement.App.Helper
         {
             CreateMap<Reader, ReaderDto>();
             CreateMap<ReaderDto, Reader>();
+
+            CreateMap<Book, BookDto>();
+            CreateMap<BookDto, Book>();
         }
     }
 }

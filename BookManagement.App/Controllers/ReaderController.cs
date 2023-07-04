@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BookManagement.App.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/reader")]
     public class ReaderController : Controller
     {
         private readonly IReaderRepository _readerRepository;
@@ -57,7 +57,7 @@ namespace BookManagement.App.Controllers
             return Ok(reader);
         }
 
-        [HttpGet("{billId}/reader")]
+        [HttpGet("bill/{billId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
