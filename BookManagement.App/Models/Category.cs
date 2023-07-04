@@ -7,7 +7,5 @@
         public string Name { get; set; }
 
         public ICollection<BookCategory> BookCategories { get; set; }
-
-        public PricePerDay PricePerDay { get; set; }
     }
 }

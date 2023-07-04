@@ -17,8 +17,6 @@ namespace BookManagement.App.Data
 
         public DbSet<Category> Categories { get; set; }
 
-        public DbSet<PricePerDay> PricePerDays { get; set;}
-
         public DbSet<Reader> Readers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,12 +35,6 @@ namespace BookManagement.App.Data
                 .WithMany(b => b.BookCategories)
                 .HasForeignKey(bc => bc.CategoryId);
 
-            //  category - pricePerDay (one - one)
-            modelBuilder.Entity<Category>()
-                .HasOne(c => c.PricePerDay)
-                .WithOne(p => p.Category)
-                .HasForeignKey<PricePerDay>(p => p.CategoryId);
-
             // book - bill (many - one)
             modelBuilder.Entity<Book>()
                 .HasMany(b => b.Bills)
@@ -54,6 +46,12 @@ namespace BookManagement.App.Data
                 .HasMany(r => r.Bills)
                 .WithOne(b => b.Reader)
                 .HasForeignKey(r => r.ReaderId);
+
+            //bill - billDetail (one - one)
+            modelBuilder.Entity<BillDetail>()
+                .HasOne(bd => bd.Bill)
+                .WithOne(b => b.BillDetail)
+                .HasForeignKey<BillDetail>(bd => bd.BillId);
         }
     }
 }

@@ -76,7 +76,7 @@ namespace BookManagement.App.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (books == null)
+            if (books.Count == 0)
             {
                 return NotFound("Not Found Book");
             }

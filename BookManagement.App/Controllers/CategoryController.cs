@@ -55,7 +55,7 @@ namespace BookManagement.App.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (category== null)
+            if (category == null)
             {
                 return NotFound("Not Found Category");
             }
@@ -77,7 +77,7 @@ namespace BookManagement.App.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (categories == null)
+            if (categories.Count == 0)
             {
                 return NotFound("Not Found Category");
             }
