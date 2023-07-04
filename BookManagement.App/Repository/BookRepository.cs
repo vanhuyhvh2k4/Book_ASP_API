@@ -23,11 +23,6 @@ namespace BookManagement.App.Repository
             return _context.Books.Find(bookId);
         }
 
-        public Book GetBookByBill(int billId)
-        {
-            return _context.Bills.Where(bill => bill.Id == billId).Select(b => b.Book).FirstOrDefault();
-        }
-
         public ICollection<Book> GetBooks()
         {
             return _context.Books.OrderBy(book => book.Id).ToList();

@@ -25,15 +25,31 @@ namespace BookManagement.App.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("BorrowDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsReturned")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<long?>("Pay")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PricePerDay")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("ReaderId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<DateTime?>("ReturnDate")
+                        .HasColumnType("datetime(6)");
 
-                    b.HasIndex("BookId");
+                    b.Property<int>("TotalBooks")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TotalDate")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ReaderId");
 
@@ -49,30 +65,19 @@ namespace BookManagement.App.Migrations
                     b.Property<int>("BillId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsReturned")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<long>("Pay")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PricePerDay")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("ReturnDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("TotalDay")
+                    b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("borrowDate")
-                        .HasColumnType("datetime(6)");
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BillId")
-                        .IsUnique();
+                    b.HasIndex("BillId");
 
-                    b.ToTable("BillDetail");
+                    b.HasIndex("BookId");
+
+                    b.ToTable("BillDetails");
                 });
 
             modelBuilder.Entity("BookManagement.App.Models.Book", b =>
@@ -85,7 +90,10 @@ namespace BookManagement.App.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("CurrentQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InitQuantity")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -148,19 +156,11 @@ namespace BookManagement.App.Migrations
 
             modelBuilder.Entity("BookManagement.App.Models.Bill", b =>
                 {
-                    b.HasOne("BookManagement.App.Models.Book", "Book")
-                        .WithMany("Bills")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BookManagement.App.Models.Reader", "Reader")
                         .WithMany("Bills")
                         .HasForeignKey("ReaderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Book");
 
                     b.Navigation("Reader");
                 });
@@ -168,12 +168,20 @@ namespace BookManagement.App.Migrations
             modelBuilder.Entity("BookManagement.App.Models.BillDetail", b =>
                 {
                     b.HasOne("BookManagement.App.Models.Bill", "Bill")
-                        .WithOne("BillDetail")
-                        .HasForeignKey("BookManagement.App.Models.BillDetail", "BillId")
+                        .WithMany("BillDetails")
+                        .HasForeignKey("BillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookManagement.App.Models.Book", "Book")
+                        .WithMany("BillDetails")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Bill");
+
+                    b.Navigation("Book");
                 });
 
             modelBuilder.Entity("BookManagement.App.Models.BookCategory", b =>
@@ -197,13 +205,12 @@ namespace BookManagement.App.Migrations
 
             modelBuilder.Entity("BookManagement.App.Models.Bill", b =>
                 {
-                    b.Navigation("BillDetail")
-                        .IsRequired();
+                    b.Navigation("BillDetails");
                 });
 
             modelBuilder.Entity("BookManagement.App.Models.Book", b =>
                 {
-                    b.Navigation("Bills");
+                    b.Navigation("BillDetails");
 
                     b.Navigation("BookCategories");
                 });

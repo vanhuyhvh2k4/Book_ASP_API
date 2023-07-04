@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookManagement.App.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230703061254_Initial Migration")]
-    partial class InitialMigration
+    [Migration("20230704060623_Add Migration")]
+    partial class AddMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,16 +28,16 @@ namespace BookManagement.App.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("BorrowDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<bool>("IsRetruned")
+                    b.Property<bool>("IsReturned")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<long>("Price")
+                    b.Property<long?>("Pay")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PricePerDay")
                         .HasColumnType("bigint");
 
                     b.Property<int>("ReaderId")
@@ -46,13 +46,41 @@ namespace BookManagement.App.Migrations
                     b.Property<DateTime?>("ReturnDate")
                         .HasColumnType("datetime(6)");
 
-                    b.HasKey("Id");
+                    b.Property<int>("TotalBooks")
+                        .HasColumnType("int");
 
-                    b.HasIndex("BookId");
+                    b.Property<int?>("TotalDate")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ReaderId");
 
                     b.ToTable("Bills");
+                });
+
+            modelBuilder.Entity("BookManagement.App.Models.BillDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("BillId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BillId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("BillDetails");
                 });
 
             modelBuilder.Entity("BookManagement.App.Models.Book", b =>
@@ -65,7 +93,10 @@ namespace BookManagement.App.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("CurrentQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InitQuantity")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -103,26 +134,6 @@ namespace BookManagement.App.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("BookManagement.App.Models.PricePerDay", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("Price")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId")
-                        .IsUnique();
-
-                    b.ToTable("PricePerDays");
-                });
-
             modelBuilder.Entity("BookManagement.App.Models.Reader", b =>
                 {
                     b.Property<int>("Id")
@@ -148,21 +159,32 @@ namespace BookManagement.App.Migrations
 
             modelBuilder.Entity("BookManagement.App.Models.Bill", b =>
                 {
-                    b.HasOne("BookManagement.App.Models.Book", "Book")
-                        .WithMany("Bills")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BookManagement.App.Models.Reader", "Reader")
                         .WithMany("Bills")
                         .HasForeignKey("ReaderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Book");
-
                     b.Navigation("Reader");
+                });
+
+            modelBuilder.Entity("BookManagement.App.Models.BillDetail", b =>
+                {
+                    b.HasOne("BookManagement.App.Models.Bill", "Bill")
+                        .WithMany("BillDetails")
+                        .HasForeignKey("BillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookManagement.App.Models.Book", "Book")
+                        .WithMany("BillDetails")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bill");
+
+                    b.Navigation("Book");
                 });
 
             modelBuilder.Entity("BookManagement.App.Models.BookCategory", b =>
@@ -184,20 +206,14 @@ namespace BookManagement.App.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("BookManagement.App.Models.PricePerDay", b =>
+            modelBuilder.Entity("BookManagement.App.Models.Bill", b =>
                 {
-                    b.HasOne("BookManagement.App.Models.Category", "Category")
-                        .WithOne("PricePerDay")
-                        .HasForeignKey("BookManagement.App.Models.PricePerDay", "CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
+                    b.Navigation("BillDetails");
                 });
 
             modelBuilder.Entity("BookManagement.App.Models.Book", b =>
                 {
-                    b.Navigation("Bills");
+                    b.Navigation("BillDetails");
 
                     b.Navigation("BookCategories");
                 });
@@ -205,9 +221,6 @@ namespace BookManagement.App.Migrations
             modelBuilder.Entity("BookManagement.App.Models.Category", b =>
                 {
                     b.Navigation("BookCategories");
-
-                    b.Navigation("PricePerDay")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("BookManagement.App.Models.Reader", b =>

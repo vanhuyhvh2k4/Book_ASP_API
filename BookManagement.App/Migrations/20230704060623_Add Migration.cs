@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BookManagement.App.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class AddMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,7 +23,8 @@ namespace BookManagement.App.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     BookName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Quantity = table.Column<int>(type: "int", nullable: false)
+                    InitQuantity = table.Column<int>(type: "int", nullable: false),
+                    CurrentQuantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -91,48 +92,23 @@ namespace BookManagement.App.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "PricePerDays",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Price = table.Column<long>(type: "bigint", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PricePerDays", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PricePerDays_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Bills",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ReaderId = table.Column<int>(type: "int", nullable: false),
                     BorrowDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     ReturnDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    IsRetruned = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Price = table.Column<long>(type: "bigint", nullable: false),
-                    BookId = table.Column<int>(type: "int", nullable: false),
-                    ReaderId = table.Column<int>(type: "int", nullable: false)
+                    TotalDate = table.Column<int>(type: "int", nullable: true),
+                    TotalBooks = table.Column<int>(type: "int", nullable: false),
+                    PricePerDay = table.Column<long>(type: "bigint", nullable: false),
+                    IsReturned = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Pay = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Bills", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Bills_Books_BookId",
-                        column: x => x.BookId,
-                        principalTable: "Books",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Bills_Readers_ReaderId",
                         column: x => x.ReaderId,
@@ -142,9 +118,42 @@ namespace BookManagement.App.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "BillDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    BillId = table.Column<int>(type: "int", nullable: false),
+                    BookId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BillDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BillDetails_Bills_BillId",
+                        column: x => x.BillId,
+                        principalTable: "Bills",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BillDetails_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.CreateIndex(
-                name: "IX_Bills_BookId",
-                table: "Bills",
+                name: "IX_BillDetails_BillId",
+                table: "BillDetails",
+                column: "BillId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BillDetails_BookId",
+                table: "BillDetails",
                 column: "BookId");
 
             migrationBuilder.CreateIndex(
@@ -156,34 +165,28 @@ namespace BookManagement.App.Migrations
                 name: "IX_BookCategories_CategoryId",
                 table: "BookCategories",
                 column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PricePerDays_CategoryId",
-                table: "PricePerDays",
-                column: "CategoryId",
-                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Bills");
+                name: "BillDetails");
 
             migrationBuilder.DropTable(
                 name: "BookCategories");
 
             migrationBuilder.DropTable(
-                name: "PricePerDays");
-
-            migrationBuilder.DropTable(
-                name: "Readers");
+                name: "Bills");
 
             migrationBuilder.DropTable(
                 name: "Books");
 
             migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Readers");
         }
     }
 }

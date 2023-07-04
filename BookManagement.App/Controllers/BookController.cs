@@ -83,27 +83,5 @@ namespace BookManagement.App.Controllers
 
             return Ok(books);
         }
-
-        [HttpGet("bill/{billId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult GetBookByBill([FromRoute] int billId)
-        {
-            var book = _mapper.Map<BookDto>(_bookRepository.GetBookByBill(billId));
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            if (book == null)
-            {
-                return NotFound("Not Found Book");
-            }
-
-            return Ok(book);
-        }
     }
 }

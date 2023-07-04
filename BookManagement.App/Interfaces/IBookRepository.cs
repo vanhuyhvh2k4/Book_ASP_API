@@ -11,7 +11,5 @@ namespace BookManagement.App.Interfaces
         bool BookExists(int bookId);
 
         ICollection<Book> GetBooksByCategory(int categoryId);
-
-        Book GetBookByBill(int billId);
     }
 }
