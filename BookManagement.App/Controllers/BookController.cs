@@ -47,16 +47,16 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetBook([FromRoute] int bookId)
         {
-            if (!_bookRepository.BookExists(bookId))
-            {
-                return NotFound();
-            }
-
             var book = _mapper.Map<BookDto>(_bookRepository.GetBook(bookId));
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            if (book == null)
+            {
+                return NotFound("Not Found Book");
             }
 
             return Ok(book);
@@ -78,7 +78,7 @@ namespace BookManagement.App.Controllers
 
             if (books == null)
             {
-                return NotFound();
+                return NotFound("Not Found Book");
             }
 
             return Ok(books);
@@ -100,7 +100,7 @@ namespace BookManagement.App.Controllers
 
             if (book == null)
             {
-                return NotFound();
+                return NotFound("Not Found Book");
             }
 
             return Ok(book);

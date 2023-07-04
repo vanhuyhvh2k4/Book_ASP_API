@@ -13,6 +13,9 @@ namespace BookManagement.App.Helper
 
             CreateMap<Book, BookDto>();
             CreateMap<BookDto, Book>();
+
+            CreateMap<Category, CategoryDto>();
+            CreateMap<CategoryDto, Category>();
         }
     }
 }

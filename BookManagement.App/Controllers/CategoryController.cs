@@ -1,20 +1,21 @@
 ﻿using AutoMapper;
 using BookManagement.App.Dto;
 using BookManagement.App.Interfaces;
+using BookManagement.App.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookManagement.App.Controllers
 {
     [ApiController]
-    [Route("api/reader")]
-    public class ReaderController : Controller
+    [Route("api/category")]
+    public class CategoryController : Controller
     {
-        private readonly IReaderRepository _readerRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
 
-        public ReaderController(IReaderRepository readerRepository, IMapper mapper)
+        public CategoryController(ICategoryRepository categoryRepository, IMapper mapper)
         {
-            _readerRepository = readerRepository;
+            _categoryRepository = categoryRepository;
             _mapper = mapper;
         }
 
@@ -23,65 +24,65 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult GetReaders()
+        public IActionResult GetCategories()
         {
-            var readers = _mapper.Map<List<ReaderDto>>(_readerRepository.GetReaders());
+            var categories = _mapper.Map<List<CategoryDto>>(_categoryRepository.GetCategories());
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            
-            if (readers == null)
+
+            if (categories == null)
             {
-                return NotFound("Not Found Reader");
+                return NotFound("Not Found Category");
             }
 
-            return Ok(readers);
+            return Ok(categories);
         }
 
-        [HttpGet("{readerId}")]
+        [HttpGet("{categoryId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult GetReader([FromRoute] int readerId)
+        public IActionResult GetCategory([FromRoute] int categoryId)
         {
-            var reader = _mapper.Map<ReaderDto>(_readerRepository.GetReader(readerId));
+            var category = _mapper.Map<CategoryDto>(_categoryRepository.GetCategory(categoryId));
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (reader == null)
+            if (category== null)
             {
-                return NotFound("Not Found Reader");
+                return NotFound("Not Found Category");
             }
 
-            return Ok(reader);
+            return Ok(category);
         }
 
-        [HttpGet("bill/{billId}")]
+        [HttpGet("book/{bookId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult GetReaderByBill([FromRoute] int billId)
+        public IActionResult GetCategoriesOfBook([FromRoute] int bookId)
         {
-            var reader = _mapper.Map<ReaderDto>(_readerRepository.GetReaderByBill(billId));
+            var categories = _mapper.Map<List<CategoryDto>>(_categoryRepository.GetCategoriesOfBook(bookId));
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (reader == null)
+            if (categories == null)
             {
-                return NotFound("Not Found Reader");
+                return NotFound("Not Found Category");
             }
 
-            return Ok(reader);
+            return Ok(categories);
         }
     }
 }
