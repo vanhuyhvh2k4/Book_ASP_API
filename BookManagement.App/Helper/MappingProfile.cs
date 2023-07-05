@@ -16,6 +16,12 @@ namespace BookManagement.App.Helper
 
             CreateMap<Category, CategoryDto>();
             CreateMap<CategoryDto, Category>();
+
+            CreateMap<Bill, BillDto>();
+            CreateMap<BillDto, Bill>();
+
+            CreateMap<BillDetail, BillDetailDto>();
+            CreateMap<BillDetailDto, BillDetail>();
         }
     }
 }
