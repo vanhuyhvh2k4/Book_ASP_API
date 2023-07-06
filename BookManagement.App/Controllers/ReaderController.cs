@@ -99,9 +99,9 @@ namespace BookManagement.App.Controllers
 
             var reader = new Reader()
             {
-                FullName = createReader.FullName,
-                Email = createReader.Email,
-                Phone = createReader.Phone
+                FullName = createReader.FullName.Trim(),
+                Email = createReader.Email.Trim(),
+                Phone = createReader.Phone.Trim()
             };
 
             if(!_readerRepository.CreateReader(reader))

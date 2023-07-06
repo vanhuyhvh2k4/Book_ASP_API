@@ -11,5 +11,9 @@ namespace BookManagement.App.Interfaces
         bool CategoriesExists(int categoryId);
 
         ICollection<Category> GetCategoriesOfBook(int bookId);
+
+        bool CreateCategory(Category category);
+
+        bool Save();
     }
 }

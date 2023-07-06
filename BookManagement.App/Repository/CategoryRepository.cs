@@ -17,6 +17,12 @@ namespace BookManagement.App.Repository
             return _context.Categories.Any(cate => cate.Id == categoryId);
         }
 
+        public bool CreateCategory(Category category)
+        {
+            _context.Categories.Add(category);
+            return Save();
+        }
+
         public ICollection<Category> GetCategories()
         {
             return _context.Categories.OrderBy(cate => cate.Id).ToList();
@@ -30,6 +36,12 @@ namespace BookManagement.App.Repository
         public Category GetCategory(int categoryId)
         {
             return _context.Categories.Find(categoryId);
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
         }
     }
 }
