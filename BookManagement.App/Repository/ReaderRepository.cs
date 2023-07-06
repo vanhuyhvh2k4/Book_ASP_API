@@ -13,6 +13,12 @@ namespace BookManagement.App.Repository
             _context = context;
         }
 
+        public bool CreateReader(Reader reader)
+        {
+            _context.Readers.Add(reader);
+            return Save();
+        }
+
         public Reader GetReader(int readerId)
         {
             return _context.Readers.Find(readerId);
@@ -31,6 +37,13 @@ namespace BookManagement.App.Repository
         public bool ReaderExists(int readerId)
         {
             return _context.Readers.Any(reader => reader.Id == readerId);
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+
+            return saved > 0 ? true : false;
         }
     }
 }

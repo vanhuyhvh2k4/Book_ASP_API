@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BookManagement.App.Dto;
 using BookManagement.App.Interfaces;
+using BookManagement.App.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookManagement.App.Controllers
@@ -82,6 +83,35 @@ namespace BookManagement.App.Controllers
             }
 
             return Ok(reader);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult CreateReader([FromBody] ReaderDto createReader)
+        {
+            if (createReader == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var reader = new Reader()
+            {
+                FullName = createReader.FullName,
+                Email = createReader.Email,
+                Phone = createReader.Phone
+            };
+
+            if(!_readerRepository.CreateReader(reader))
+            {
+                ModelState.AddModelError("", "Something went wrong while creating");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("created successfully");
+
         }
     }
 }

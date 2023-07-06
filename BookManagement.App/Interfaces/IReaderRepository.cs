@@ -11,5 +11,9 @@ namespace BookManagement.App.Interfaces
         bool ReaderExists(int readerId);
 
         Reader GetReaderByBill(int billId);
+
+        bool CreateReader(Reader reader);
+
+        bool Save();
     }
 }
