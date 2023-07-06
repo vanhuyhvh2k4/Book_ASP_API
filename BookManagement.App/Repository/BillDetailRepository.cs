@@ -30,12 +30,18 @@ namespace BookManagement.App.Repository
 
         public ICollection<BillDetail> GetBillDetailOfBill(int billId)
         {
-            return _context.BillDetails.Where(bill => bill.BillId == billId).ToList();
+            return _context.BillDetails
+                        .Where(bill => bill.BillId == billId)
+                        .Include(bill => bill.Book)
+                        .ToList();
         }
 
         public ICollection<BillDetail> GetBillDetails()
         {
-            return _context.BillDetails.OrderBy(bill => bill.Id).ToList();
+            return _context.BillDetails
+                .OrderBy(bill => bill.Id)
+                .Include(bill => bill.Book)
+                .ToList();
         }
     }
 }

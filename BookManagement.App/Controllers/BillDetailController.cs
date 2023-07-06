@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BookManagement.App.Dto;
 using BookManagement.App.Interfaces;
+using BookManagement.App.Models;
 using BookManagement.App.Repository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,9 +25,18 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult GetBillDetail()
+        public IActionResult GetBillDetails()
         {
-            var billDetails = _mapper.Map<List<BillDetailDto>>(_billDetailRepository.GetBillDetails());
+            var billDetails = _billDetailRepository
+                                .GetBillDetails()
+                                .Select(bill => new
+                                {
+                                    Id = bill.Id,
+                                    BookId = bill.BookId,
+                                    BookName = bill.Book.BookName,
+                                    Quantity = bill.Quantity,
+                                })
+                                .ToList();
 
             if (!ModelState.IsValid)
             {
@@ -60,7 +70,14 @@ namespace BookManagement.App.Controllers
                 return NotFound("Not Found Bill");
             }
 
-            return Ok(bill);
+            var response = new {
+                Id = bill.Id,
+                BookId = bill.BookId,
+                BookName = bill.Book.BookName,
+                Quantity = bill.Quantity
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("bill/{billId}")]
@@ -70,7 +87,16 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetBillDetailOfBill([FromRoute] int billId)
         {
-            var bills = _mapper.Map<List<BillDetailDto>>(_billDetailRepository.GetBillDetailOfBill(billId));
+            var bills = _billDetailRepository
+                            .GetBillDetailOfBill(billId)
+                            .Select(bill => new
+                            {
+                                Id = bill.Id,
+                                BookId = bill.Book.Id,
+                                BookName = bill.Book.BookName,
+                                Quantity = bill.Quantity,
+                            })
+                            .ToList();
 
             if (!ModelState.IsValid)
             {
