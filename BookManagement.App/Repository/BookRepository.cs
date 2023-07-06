@@ -18,6 +18,21 @@ namespace BookManagement.App.Repository
             return _context.Books.Any(book => book.Id == bookId);
         }
 
+        public bool CreateBook(int categoryId, Book book)
+        {
+            var category = _context.Categories.Find(categoryId);
+
+            var bookCategory = new BookCategory()
+            {
+                Category = category,
+                Book= book,
+            };
+
+            _context.BookCategories.Add(bookCategory);
+            _context.Books.Add(book);
+            return Save();
+        }
+
         public Book GetBook(int bookId)
         {
             return _context.Books.Find(bookId);
@@ -31,6 +46,12 @@ namespace BookManagement.App.Repository
         public ICollection<Book> GetBooksByCategory(int categoryId)
         {
             return _context.BookCategories.Where(bookCategory => bookCategory.CategoryId == categoryId).Select(bc => bc.Book).ToList();
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
         }
     }
 }

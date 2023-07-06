@@ -92,7 +92,7 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult CreateReader([FromBody] ReaderDto createReader)
         {
-            if (createReader == null)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }

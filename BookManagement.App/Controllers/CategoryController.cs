@@ -93,7 +93,7 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult CreateCategory([FromBody] CategoryDto createCategory)
         {
-            if (createCategory == null)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }

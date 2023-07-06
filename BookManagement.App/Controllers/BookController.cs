@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BookManagement.App.Dto;
 using BookManagement.App.Interfaces;
+using BookManagement.App.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookManagement.App.Controllers
@@ -10,11 +11,13 @@ namespace BookManagement.App.Controllers
     public class BookController : Controller
     {
         private readonly IBookRepository _bookRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
 
-        public BookController(IBookRepository bookRepository, IMapper mapper)
+        public BookController(IBookRepository bookRepository, ICategoryRepository categoryRepository, IMapper mapper)
         {
             _bookRepository = bookRepository;
+            _categoryRepository = categoryRepository;
             _mapper = mapper;
         }
 
@@ -82,6 +85,51 @@ namespace BookManagement.App.Controllers
             }
 
             return Ok(books);
+        }
+
+        [HttpPost("{categoryId}")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult CreateBook([FromBody] BookDto createBook,[FromRoute] int categoryId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_categoryRepository.CategoriesExists(categoryId))
+            {
+                ModelState.AddModelError("", "Category is not exists");
+                return StatusCode(404, ModelState);
+            }
+
+            var isExists = _bookRepository
+                            .GetBooks()
+                            .Where(b => b.BookName.Trim().ToUpper() == createBook.BookName.Trim().ToUpper())
+                            .FirstOrDefault();
+
+            if (isExists != null)
+            {
+                ModelState.AddModelError("", "Book already exists");
+                return StatusCode(409, ModelState);
+            }
+
+            var newBook = new Book()
+            {
+                BookName = createBook.BookName,
+                InitQuantity = createBook.InitQuantity,
+                CurrentQuantity = createBook.CurrentQuantity,
+            };
+
+            if (!_bookRepository.CreateBook(categoryId, newBook))
+            {
+                ModelState.AddModelError("", "Something went wrong while creating");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("created successfully");
         }
     }
 }
