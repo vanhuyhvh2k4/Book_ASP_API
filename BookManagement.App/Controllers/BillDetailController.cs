@@ -12,11 +12,15 @@ namespace BookManagement.App.Controllers
     public class BillDetailController : Controller
     {
         private readonly IBillDetailRepository _billDetailRepository;
+        private readonly IBillRepository _billRepository;
+        private readonly IBookRepository _bookRepository;
         private readonly IMapper _mapper;
 
-        public BillDetailController(IBillDetailRepository billDetailRepository, IMapper mapper)
+        public BillDetailController(IBillDetailRepository billDetailRepository, IBillRepository billRepository, IBookRepository bookRepository, IMapper mapper)
         {
             _billDetailRepository = billDetailRepository;
+            _billRepository = billRepository;
+            _bookRepository = bookRepository;
             _mapper = mapper;
         }
 
@@ -109,6 +113,49 @@ namespace BookManagement.App.Controllers
             }
 
             return Ok(bills);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult CreateBillDetail([FromBody] BillDetailDto createBillDetail)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_billRepository.BillExists(createBillDetail.BillId))
+            {
+                return NotFound("Not Found Bill");
+            }
+
+            if (!_bookRepository.BookExists(createBillDetail.BookId))
+            {
+                return NotFound("Not Found Book");
+            }
+
+            if (createBillDetail.Quantity <= 0)
+            {
+                return BadRequest("Quantity must be greater than zero");
+            }
+
+            var newBillDetail = new BillDetail()
+            {
+                BillId = createBillDetail.BillId,
+                BookId = createBillDetail.BookId,
+                Quantity = createBillDetail.Quantity
+            };
+
+            if (!_billDetailRepository.CreateBillDetail(newBillDetail))
+            {
+                ModelState.AddModelError("", "Somthing went wrong while creating");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Created successfully");
         }
     }
 }

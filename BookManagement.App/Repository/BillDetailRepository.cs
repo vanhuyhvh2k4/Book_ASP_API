@@ -20,6 +20,12 @@ namespace BookManagement.App.Repository
             return _context.BillDetails.Any(bill => bill.Id == billDetailId);
         }
 
+        public bool CreateBillDetail(BillDetail billDetail)
+        {
+            _context.BillDetails.Add(billDetail);
+            return Save();
+        }
+
         public BillDetail GetBillDetail(int billDetailId)
         {
             return _context.BillDetails
@@ -42,6 +48,12 @@ namespace BookManagement.App.Repository
                 .OrderBy(bill => bill.Id)
                 .Include(bill => bill.Book)
                 .ToList();
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
         }
     }
 }
