@@ -18,6 +18,12 @@ namespace BookManagement.App.Repository
             return _context.Bills.Any(bill => bill.Id == billId);
         }
 
+        public bool CreateBill(Bill bill)
+        {
+            _context.Bills.Add(bill);
+            return Save();
+        }
+
         public Bill GetBill(int billId)
         {
             return _context.Bills.Find(billId);
@@ -31,6 +37,12 @@ namespace BookManagement.App.Repository
         public ICollection<Bill> GetBillsOfReader(int readerId)
         {
             return _context.Bills.Where(bill => bill.ReaderId == readerId).ToList();
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
         }
     }
 }

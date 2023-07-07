@@ -11,5 +11,9 @@ namespace BookManagement.App.Interfaces
         bool BillExists(int billId);
 
         ICollection<Bill> GetBillsOfReader(int readerId);
+
+        bool CreateBill(Bill bill);
+
+        bool Save();
     }
 }
