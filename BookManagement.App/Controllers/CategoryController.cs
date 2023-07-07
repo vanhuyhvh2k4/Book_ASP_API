@@ -27,19 +27,29 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetCategories()
         {
-            var categories = _mapper.Map<List<CategoryDto>>(_categoryRepository.GetCategories());
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var categories = _mapper.Map<List<CategoryDto>>(_categoryRepository.GetCategories());
 
-            if (categories == null)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (categories == null)
+                {
+                    return NotFound("Not Found Category");
+                }
+
+                return Ok(categories);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Category");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(categories);
         }
 
         [HttpGet("{categoryId}")]
@@ -49,19 +59,29 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetCategory([FromRoute] int categoryId)
         {
-            var category = _mapper.Map<CategoryDto>(_categoryRepository.GetCategory(categoryId));
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var category = _mapper.Map<CategoryDto>(_categoryRepository.GetCategory(categoryId));
 
-            if (category == null)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (category == null)
+                {
+                    return NotFound("Not Found Category");
+                }
+
+                return Ok(category);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Category");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(category);
         }
 
         [HttpGet("book/{bookId}")]
@@ -71,19 +91,29 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetCategoriesOfBook([FromRoute] int bookId)
         {
-            var categories = _mapper.Map<List<CategoryDto>>(_categoryRepository.GetCategoriesOfBook(bookId));
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var categories = _mapper.Map<List<CategoryDto>>(_categoryRepository.GetCategoriesOfBook(bookId));
 
-            if (categories.Count == 0)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (categories.Count == 0)
+                {
+                    return NotFound("Not Found Category");
+                }
+
+                return Ok(categories);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Category");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(categories);
         }
 
         [HttpPost]
@@ -93,34 +123,41 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult CreateCategory([FromBody] CategoryDto createCategory)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var isExist = _categoryRepository
+                                .GetCategories()
+                                .Where(c => c.Name.Trim().ToUpper() == createCategory.Name.Trim().ToUpper())
+                                .FirstOrDefault();
+
+                if (isExist != null)
+                {
+                    ModelState.AddModelError("", "Category already exists");
+                    return StatusCode(409, ModelState);
+                }
+
+                var newCategory = new Category()
+                {
+                    Name = createCategory.Name.Trim()
+                };
+
+                _categoryRepository.CreateCategory(newCategory);
+
+                return Ok("Created successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while creating",
+                    Message = ex.Message,
+                });
             }
-
-            var isExist = _categoryRepository
-                            .GetCategories()
-                            .Where(c => c.Name.Trim().ToUpper() == createCategory.Name.Trim().ToUpper())
-                            .FirstOrDefault();
-
-            if (isExist != null)
-            {
-                ModelState.AddModelError("", "Category already exists");
-                return StatusCode(409, ModelState);
-            }
-
-            var newCategory = new Category()
-            {
-                Name = createCategory.Name.Trim()
-            };
-
-            if(!_categoryRepository.CreateCategory(newCategory))
-            {
-                ModelState.AddModelError("", "Something went wrong while creating");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Created successfully");
         }
     }
 }

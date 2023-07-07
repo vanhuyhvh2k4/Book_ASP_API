@@ -45,5 +45,11 @@ namespace BookManagement.App.Repository
 
             return saved > 0 ? true : false;
         }
+
+        public bool UpdateReader(Reader reader)
+        {
+            _context.Readers.Update(reader);
+            return Save();
+        }
     }
 }

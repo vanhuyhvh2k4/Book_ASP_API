@@ -28,19 +28,29 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetBooks()
         {
-            var books = _mapper.Map<List<BookDto>>(_bookRepository.GetBooks());
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var books = _mapper.Map<List<BookDto>>(_bookRepository.GetBooks());
 
-            if (books == null)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (books == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(books);
+            } catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(books);
         }
 
         [HttpGet("{bookId}")]
@@ -50,19 +60,29 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetBook([FromRoute] int bookId)
         {
-            var book = _mapper.Map<BookDto>(_bookRepository.GetBook(bookId));
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var book = _mapper.Map<BookDto>(_bookRepository.GetBook(bookId));
 
-            if (book == null)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (book == null)
+                {
+                    return NotFound("Not Found Book");
+                }
+
+                return Ok(book);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Book");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(book);
         }
 
         [HttpGet("category/{categoryId}")]
@@ -72,19 +92,29 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetBooksByCategory([FromRoute] int categoryId)
         {
-            var books = _mapper.Map<List<BookDto>>(_bookRepository.GetBooksByCategory(categoryId));
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var books = _mapper.Map<List<BookDto>>(_bookRepository.GetBooksByCategory(categoryId));
 
-            if (books.Count == 0)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (books.Count == 0)
+                {
+                    return NotFound("Not Found Book");
+                }
+
+                return Ok(books);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Book");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(books);
         }
 
         [HttpPost("{categoryId}")]
@@ -94,42 +124,48 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult CreateBook([FromBody] BookDto createBook,[FromRoute] int categoryId)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (!_categoryRepository.CategoriesExists(categoryId))
+                {
+                    ModelState.AddModelError("", "Category is not exists");
+                    return StatusCode(404, ModelState);
+                }
+
+                var isExists = _bookRepository
+                                .GetBooks()
+                                .Where(b => b.BookName.Trim().ToUpper() == createBook.BookName.Trim().ToUpper())
+                                .FirstOrDefault();
+
+                if (isExists != null)
+                {
+                    ModelState.AddModelError("", "Book already exists");
+                    return StatusCode(409, ModelState);
+                }
+
+                var newBook = new Book()
+                {
+                    BookName = createBook.BookName,
+                    InitQuantity = createBook.InitQuantity,
+                    CurrentQuantity = createBook.CurrentQuantity,
+                };
+
+                _bookRepository.CreateBook(categoryId, newBook);
+
+                return Ok("created successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while creating",
+                    Message = ex.Message,
+                });
             }
-
-            if (!_categoryRepository.CategoriesExists(categoryId))
-            {
-                ModelState.AddModelError("", "Category is not exists");
-                return StatusCode(404, ModelState);
-            }
-
-            var isExists = _bookRepository
-                            .GetBooks()
-                            .Where(b => b.BookName.Trim().ToUpper() == createBook.BookName.Trim().ToUpper())
-                            .FirstOrDefault();
-
-            if (isExists != null)
-            {
-                ModelState.AddModelError("", "Book already exists");
-                return StatusCode(409, ModelState);
-            }
-
-            var newBook = new Book()
-            {
-                BookName = createBook.BookName,
-                InitQuantity = createBook.InitQuantity,
-                CurrentQuantity = createBook.CurrentQuantity,
-            };
-
-            if (!_bookRepository.CreateBook(categoryId, newBook))
-            {
-                ModelState.AddModelError("", "Something went wrong while creating");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("created successfully");
         }
     }
 }

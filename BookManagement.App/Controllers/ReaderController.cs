@@ -26,19 +26,29 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetReaders()
         {
-            var readers = _mapper.Map<List<ReaderDto>>(_readerRepository.GetReaders());
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var readers = _mapper.Map<List<ReaderDto>>(_readerRepository.GetReaders());
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
             
-            if (readers == null)
-            {
-                return NotFound("Not Found Reader");
-            }
+                if (readers == null)
+                {
+                    return NotFound("Not Found Reader");
+                }
 
-            return Ok(readers);
+                return Ok(readers);
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
+            }
         }
 
         [HttpGet("{readerId}")]
@@ -48,19 +58,29 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetReader([FromRoute] int readerId)
         {
-            var reader = _mapper.Map<ReaderDto>(_readerRepository.GetReader(readerId));
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var reader = _mapper.Map<ReaderDto>(_readerRepository.GetReader(readerId));
 
-            if (reader == null)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (reader == null)
+                {
+                    return NotFound("Not Found Reader");
+                }
+
+                return Ok(reader);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Reader");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(reader);
         }
 
         [HttpGet("bill/{billId}")]
@@ -70,19 +90,28 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetReaderByBill([FromRoute] int billId)
         {
-            var reader = _mapper.Map<ReaderDto>(_readerRepository.GetReaderByBill(billId));
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var reader = _mapper.Map<ReaderDto>(_readerRepository.GetReaderByBill(billId));
 
-            if (reader == null)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (reader == null)
+                {
+                    return NotFound("Not Found Reader");
+                }
+                return Ok(reader);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Reader");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(reader);
         }
 
         [HttpPost]
@@ -92,25 +121,71 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult CreateReader([FromBody] ReaderDto createReader)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var reader = new Reader()
+                {
+                    FullName = createReader.FullName.Trim(),
+                    Email = createReader.Email.Trim(),
+                    Phone = createReader.Phone.Trim()
+                };
+
+                _readerRepository.CreateReader(reader);
+
+                return Ok("created successfully");
+            } catch(Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while creating",
+                    Message = ex.Message,
+                });
             }
+        }
 
-            var reader = new Reader()
+        [HttpPut("{readerId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult UpdateReader([FromRoute] int readerId, [FromBody] ReaderDto updateReader)
+        {
+            try
             {
-                FullName = createReader.FullName.Trim(),
-                Email = createReader.Email.Trim(),
-                Phone = createReader.Phone.Trim()
-            };
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            if(!_readerRepository.CreateReader(reader))
+                if (!_readerRepository.ReaderExists(readerId))
+                {
+                    return NotFound("Not Found Reader");
+                }
+
+                if (readerId != updateReader.Id)
+                {
+                    return BadRequest("Id is not match");
+                }
+
+                var readerMap = _mapper.Map<Reader>(updateReader);
+
+                _readerRepository.UpdateReader(readerMap);
+
+                return Ok("Updated successfully");
+
+            } catch(Exception ex)
             {
-                ModelState.AddModelError("", "Something went wrong while creating");
-                return StatusCode(500, ModelState);
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while updating",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok("created successfully");
 
         }
     }

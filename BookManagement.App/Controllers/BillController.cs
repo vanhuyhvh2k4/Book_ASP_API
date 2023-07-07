@@ -29,19 +29,29 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetBills()
         {
-            var bills = _mapper.Map<List<BillDto>>(_billRepository.GetBills());
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var bills = _mapper.Map<List<BillDto>>(_billRepository.GetBills());
 
-            if (bills.Count == 0)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (bills.Count == 0)
+                {
+                    return NotFound("Not Found Bill");
+                }
+
+                return Ok(bills);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Bill");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(bills);
         }
 
         [HttpGet("{billId}")]
@@ -51,19 +61,29 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetBill([FromRoute] int billId)
         {
-            var bill = _mapper.Map<BillDto>(_billRepository.GetBill(billId));
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var bill = _mapper.Map<BillDto>(_billRepository.GetBill(billId));
 
-            if (bill == null)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (bill == null)
+                {
+                    return NotFound("Not Found Bill");
+                }
+
+                return Ok(bill);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Bill");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(bill);
         }
 
         [HttpGet("reader/{readerId}")]
@@ -73,19 +93,29 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetBillsOfReader([FromRoute] int readerId)
         {
-            var bills = _mapper.Map<List<BillDto>>(_billRepository.GetBillsOfReader(readerId));
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var bills = _mapper.Map<List<BillDto>>(_billRepository.GetBillsOfReader(readerId));
 
-            if (bills.Count == 0)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (bills.Count == 0)
+                {
+                    return NotFound("Not Found Bill");
+                }
+
+                return Ok(bills);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Bill");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(bills);
         }
 
         [HttpPost]
@@ -96,29 +126,35 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult CreateBill([FromBody] BillDto createBill)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (!_readerRepository.ReaderExists(createBill.ReaderId))
+                {
+                    return NotFound("Not Found Reader");
+                }
+
+                var newBill = new Bill()
+                {
+                    ReaderId = createBill.ReaderId,
+                    BorrowDate = createBill.BorrowDate,
+                };
+
+                _billRepository.CreateBill(newBill);
+
+                return Ok("Created successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while creating",
+                    Message = ex.Message,
+                });
             }
-
-            if (!_readerRepository.ReaderExists(createBill.ReaderId))
-            {
-                return NotFound("Not Found Reader");
-            }
-
-            var newBill = new Bill()
-            {
-                ReaderId = createBill.ReaderId,
-                BorrowDate = createBill.BorrowDate,
-            };
-
-            if (!_billRepository.CreateBill(newBill))
-            {
-                ModelState.AddModelError("", "Something went wrong while creating");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Created successfully");
         }
     }
 }

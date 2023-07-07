@@ -31,28 +31,38 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetBillDetails()
         {
-            var billDetails = _billDetailRepository
-                                .GetBillDetails()
-                                .Select(bill => new
-                                {
-                                    Id = bill.Id,
-                                    BookId = bill.BookId,
-                                    BookName = bill.Book.BookName,
-                                    Quantity = bill.Quantity,
-                                })
-                                .ToList();
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var billDetails = _billDetailRepository
+                                    .GetBillDetails()
+                                    .Select(bill => new
+                                    {
+                                        Id = bill.Id,
+                                        BookId = bill.BookId,
+                                        BookName = bill.Book.BookName,
+                                        Quantity = bill.Quantity,
+                                    })
+                                    .ToList();
 
-            if (billDetails.Count == 0)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (billDetails.Count == 0)
+                {
+                    return NotFound("Not Found Bill");
+                }
+
+                return Ok(billDetails);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Bill");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(billDetails);
         }
 
         [HttpGet("{billDetailId}")]
@@ -62,26 +72,36 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetBillDetail([FromRoute] int billDetailId)
         {
-            var bill = _billDetailRepository.GetBillDetail(billDetailId);
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var bill = _billDetailRepository.GetBillDetail(billDetailId);
 
-            if (bill == null)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (bill == null)
+                {
+                    return NotFound("Not Found Bill");
+                }
+
+                var response = new {
+                    Id = bill.Id,
+                    BookId = bill.BookId,
+                    BookName = bill.Book.BookName,
+                    Quantity = bill.Quantity
+                };
+
+                return Ok(response);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Bill");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            var response = new {
-                Id = bill.Id,
-                BookId = bill.BookId,
-                BookName = bill.Book.BookName,
-                Quantity = bill.Quantity
-            };
-
-            return Ok(response);
         }
 
         [HttpGet("bill/{billId}")]
@@ -91,28 +111,38 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetBillDetailOfBill([FromRoute] int billId)
         {
-            var bills = _billDetailRepository
-                            .GetBillDetailOfBill(billId)
-                            .Select(bill => new
-                            {
-                                Id = bill.Id,
-                                BookId = bill.Book.Id,
-                                BookName = bill.Book.BookName,
-                                Quantity = bill.Quantity,
-                            })
-                            .ToList();
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var bills = _billDetailRepository
+                                .GetBillDetailOfBill(billId)
+                                .Select(bill => new
+                                {
+                                    Id = bill.Id,
+                                    BookId = bill.Book.Id,
+                                    BookName = bill.Book.BookName,
+                                    Quantity = bill.Quantity,
+                                })
+                                .ToList();
 
-            if (bills.Count == 0)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (bills.Count == 0)
+                {
+                    return NotFound("Not Found Bill");
+                }
+
+                return Ok(bills);
+            } catch (Exception ex)
             {
-                return NotFound("Not Found Bill");
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while getting",
+                    Message = ex.Message,
+                });
             }
-
-            return Ok(bills);
         }
 
         [HttpPost]
@@ -122,40 +152,46 @@ namespace BookManagement.App.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult CreateBillDetail([FromBody] BillDetailDto createBillDetail)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (!_billRepository.BillExists(createBillDetail.BillId))
+                {
+                    return NotFound("Not Found Bill");
+                }
+
+                if (!_bookRepository.BookExists(createBillDetail.BookId))
+                {
+                    return NotFound("Not Found Book");
+                }
+
+                if (createBillDetail.Quantity <= 0)
+                {
+                    return BadRequest("Quantity must be greater than zero");
+                }
+
+                var newBillDetail = new BillDetail()
+                {
+                    BillId = createBillDetail.BillId,
+                    BookId = createBillDetail.BookId,
+                    Quantity = createBillDetail.Quantity
+                };
+
+                _billDetailRepository.CreateBillDetail(newBillDetail);
+
+                return Ok("Created successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while creating",
+                    Message = ex.Message,
+                });
             }
-
-            if (!_billRepository.BillExists(createBillDetail.BillId))
-            {
-                return NotFound("Not Found Bill");
-            }
-
-            if (!_bookRepository.BookExists(createBillDetail.BookId))
-            {
-                return NotFound("Not Found Book");
-            }
-
-            if (createBillDetail.Quantity <= 0)
-            {
-                return BadRequest("Quantity must be greater than zero");
-            }
-
-            var newBillDetail = new BillDetail()
-            {
-                BillId = createBillDetail.BillId,
-                BookId = createBillDetail.BookId,
-                Quantity = createBillDetail.Quantity
-            };
-
-            if (!_billDetailRepository.CreateBillDetail(newBillDetail))
-            {
-                ModelState.AddModelError("", "Somthing went wrong while creating");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Created successfully");
         }
     }
 }
