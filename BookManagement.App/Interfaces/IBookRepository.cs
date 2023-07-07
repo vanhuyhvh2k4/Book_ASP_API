@@ -15,5 +15,7 @@ namespace BookManagement.App.Interfaces
         bool CreateBook(int categoryId, Book book);
 
         bool Save();
+
+        bool UpdateBook(Book book);
     }
 }

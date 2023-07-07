@@ -163,6 +163,40 @@ namespace BookManagement.App.Controllers
                 return StatusCode(500, new
                 {
                     Title = "Something went wrong while creating",
+Message = ex.Message,
+                });
+            }
+        }
+
+        [HttpPut("{bookId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult UpdateBook([FromRoute] int bookId, [FromBody] BookDto updateBook)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (bookId != updateBook.Id)
+                {
+                    return BadRequest("Id is not match");
+                }
+
+                var bookMap = _mapper.Map<Book>(updateBook);
+
+                _bookRepository.UpdateBook(bookMap);
+
+                return Ok("Updated successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while updating",
                     Message = ex.Message,
                 });
             }

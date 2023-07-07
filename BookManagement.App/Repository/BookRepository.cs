@@ -53,5 +53,11 @@ namespace BookManagement.App.Repository
             var saved = _context.SaveChanges();
             return saved > 0 ? true : false;
         }
+
+        public bool UpdateBook(Book book)
+        { 
+            _context.Books.Update(book);
+            return Save();
+        }
     }
 }
