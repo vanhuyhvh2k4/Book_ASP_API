@@ -159,5 +159,39 @@ namespace BookManagement.App.Controllers
                 });
             }
         }
+
+        [HttpPut("{categoryId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult UpdateCategory([FromRoute] int categoryId, [FromBody] CategoryDto updateCategory)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (categoryId != updateCategory.Id)
+                {
+                    return BadRequest("Id is not match");
+                }
+
+                var categoryMap = _mapper.Map<Category>(updateCategory);
+
+                _categoryRepository.UpdateCategory(categoryMap);
+
+                return Ok("Updated successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while updating",
+                    Message = ex.Message,
+                });
+            }
+        }
     }
 }

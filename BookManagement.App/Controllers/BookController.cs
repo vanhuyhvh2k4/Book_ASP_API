@@ -163,7 +163,7 @@ namespace BookManagement.App.Controllers
                 return StatusCode(500, new
                 {
                     Title = "Something went wrong while creating",
-Message = ex.Message,
+                    Message = ex.Message,
                 });
             }
         }
