@@ -52,7 +52,13 @@ namespace BookManagement.App.Repository
 
         public bool UpdateCategory(Category category)
         {
-            _context.Categories.Update(category);
+            var updateCategory = _context.Categories.Find(category.Id);
+
+            _context.Attach(updateCategory);
+
+            updateCategory.Name = category.Name;
+            updateCategory.UpdatedAt = DateTime.Now;
+
             return Save();
         }
     }

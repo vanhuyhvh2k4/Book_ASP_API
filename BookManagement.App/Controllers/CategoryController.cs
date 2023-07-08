@@ -144,7 +144,9 @@ namespace BookManagement.App.Controllers
 
                 var newCategory = new Category()
                 {
-                    Name = createCategory.Name.Trim()
+                    Name = createCategory.Name.Trim(),
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.MinValue,
                 };
 
                 _categoryRepository.CreateCategory(newCategory);
