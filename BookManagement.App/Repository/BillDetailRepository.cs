@@ -26,6 +26,12 @@ namespace BookManagement.App.Repository
             return Save();
         }
 
+        public bool DeleteBillDetail(BillDetail billDetail)
+        {
+            _context.BillDetails.Remove(billDetail);
+            return Save();
+        }
+
         public BillDetail GetBillDetail(int billDetailId)
         {
             return _context.BillDetails
