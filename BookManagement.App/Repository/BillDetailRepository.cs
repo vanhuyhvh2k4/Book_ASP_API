@@ -55,5 +55,11 @@ namespace BookManagement.App.Repository
             var saved = _context.SaveChanges();
             return saved > 0 ? true : false;
         }
+
+        public bool UpdateBillDetail(BillDetail billDetail)
+        {
+            _context.BillDetails.Update(billDetail);
+            return Save();
+        }
     }
 }

@@ -193,5 +193,56 @@ namespace BookManagement.App.Controllers
                 });
             }
         }
+
+        [HttpPut("{billDetailId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult UpdateBillDetail([FromRoute] int billDetailId, [FromBody] BillDetailDto updateBillDetail)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (billDetailId != updateBillDetail.Id)
+                {
+                    return BadRequest("Id is not match");
+                }
+
+                if (!_bookRepository.BookExists(updateBillDetail.BookId))
+                {
+                    return NotFound("Not Found Book");
+                }
+
+                if (!_billRepository.BillExists(updateBillDetail.BillId))
+                {
+                    return NotFound("Not Found Bill");
+                }
+
+
+
+                if (updateBillDetail.Quantity <= 0)
+                {
+                    return BadRequest("Quantity must be greater than zero");
+                }
+
+                var billDetailMap = _mapper.Map<BillDetail>(updateBillDetail);
+
+                _billDetailRepository.UpdateBillDetail(billDetailMap);
+
+                return Ok("Updated successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while updating",
+                    Message = ex.Message,
+                });
+            }
+        }
     }
 }

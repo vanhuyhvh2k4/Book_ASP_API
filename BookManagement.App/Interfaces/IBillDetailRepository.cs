@@ -15,5 +15,7 @@ namespace BookManagement.App.Interfaces
         bool CreateBillDetail(BillDetail billDetail);
 
         bool Save();
+
+        bool UpdateBillDetail(BillDetail billDetail);
     }
 }
