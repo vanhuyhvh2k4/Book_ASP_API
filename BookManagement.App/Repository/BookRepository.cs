@@ -33,6 +33,12 @@ namespace BookManagement.App.Repository
             return Save();
         }
 
+        public bool DeleteBook(Book book)
+        {
+            _context.Books.Remove(book);
+            return Save();
+        }
+
         public Book GetBook(int bookId)
         {
             return _context.Books.Find(bookId);

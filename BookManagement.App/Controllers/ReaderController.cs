@@ -217,7 +217,7 @@ namespace BookManagement.App.Controllers
             {
                 return StatusCode(500, new
                 {
-                    Title = "Something went wrong while updating",
+                    Title = "Something went wrong while deleting",
                     Message = ex.Message,
                 });
             }

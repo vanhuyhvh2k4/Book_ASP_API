@@ -201,5 +201,39 @@ namespace BookManagement.App.Controllers
                 });
             }
         }
+
+        [HttpDelete("{bookId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult DeleteBook([FromRoute] int bookId)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var bookToDelete = _bookRepository.GetBook(bookId);
+
+                if (bookToDelete == null)
+                {
+                    return NotFound("Not Found Book");
+                }
+
+                _bookRepository.DeleteBook(bookToDelete);
+
+                return Ok("Deleted successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while deleting",
+                    Message = ex.Message,
+                });
+            }
+        }
     }
 }
