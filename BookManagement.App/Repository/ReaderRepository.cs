@@ -54,7 +54,15 @@ namespace BookManagement.App.Repository
 
         public bool UpdateReader(Reader reader)
         {
-            _context.Readers.Update(reader);
+            var updateReader = _context.Readers.Find(reader.Id);
+
+            _context.Attach(updateReader);
+
+            updateReader.FullName = reader.FullName;
+            updateReader.Email = reader.Email;
+            updateReader.Phone = reader.Phone;
+            updateReader.UpdatedAt = DateTime.Now;
+
             return Save();
         }
     }

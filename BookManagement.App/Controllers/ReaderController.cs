@@ -132,7 +132,9 @@ namespace BookManagement.App.Controllers
                 {
                     FullName = createReader.FullName.Trim(),
                     Email = createReader.Email.Trim(),
-                    Phone = createReader.Phone.Trim()
+                    Phone = createReader.Phone.Trim(),
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.MinValue,
                 };
 
                 _readerRepository.CreateReader(reader);
