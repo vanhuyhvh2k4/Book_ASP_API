@@ -10,6 +10,10 @@
 
         public int CurrentQuantity { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime UpdatedAt { get; set; }
+
         public ICollection<BookCategory> BookCategories { get; set; }
 
         public ICollection<BillDetail> BillDetails { get; set; }
