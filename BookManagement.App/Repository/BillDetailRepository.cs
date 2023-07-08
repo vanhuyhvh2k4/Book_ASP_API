@@ -64,7 +64,15 @@ namespace BookManagement.App.Repository
 
         public bool UpdateBillDetail(BillDetail billDetail)
         {
-            _context.BillDetails.Update(billDetail);
+            var updateBill = _context.BillDetails.Find(billDetail.Id);
+
+            _context.Attach(updateBill);
+
+            updateBill.BillId = billDetail.BillId;
+            updateBill.BookId = billDetail.BookId;
+            updateBill.Quantity = billDetail.Quantity;
+            updateBill.UpdatedAt = DateTime.Now;
+
             return Save();
         }
     }

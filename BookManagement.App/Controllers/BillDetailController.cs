@@ -178,7 +178,9 @@ namespace BookManagement.App.Controllers
                 {
                     BillId = createBillDetail.BillId,
                     BookId = createBillDetail.BookId,
-                    Quantity = createBillDetail.Quantity
+                    Quantity = createBillDetail.Quantity,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.MinValue,
                 };
 
                 _billDetailRepository.CreateBillDetail(newBillDetail);
