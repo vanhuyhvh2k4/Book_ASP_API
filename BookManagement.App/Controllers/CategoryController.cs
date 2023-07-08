@@ -193,5 +193,39 @@ namespace BookManagement.App.Controllers
                 });
             }
         }
+
+        [HttpDelete("{categoryId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult DeleteCategory([FromRoute] int categoryId)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var categoryToDelete = _categoryRepository.GetCategory(categoryId);
+
+                if (categoryToDelete == null)
+                {
+                    return NotFound("Not Found Category");
+                }
+
+                _categoryRepository.DeleteCategory(categoryToDelete);
+
+                return Ok("Deleted successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while deleting",
+                    Message = ex.Message,
+                });
+            }
+        }
     }
 }
