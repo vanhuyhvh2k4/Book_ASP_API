@@ -61,8 +61,16 @@ namespace BookManagement.App.Repository
         }
 
         public bool UpdateBook(Book book)
-        { 
-            _context.Books.Update(book);
+        {
+            var updateBook = _context.Books.Find(book.Id);
+
+            _context.Attach(updateBook);
+
+            updateBook.BookName = book.BookName;
+            updateBook.InitQuantity = book.InitQuantity;
+            updateBook.CurrentQuantity = book.CurrentQuantity;
+            updateBook.UpdatedAt = DateTime.Now;
+
             return Save();
         }
     }

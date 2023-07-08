@@ -148,11 +148,18 @@ namespace BookManagement.App.Controllers
                     return StatusCode(409, ModelState);
                 }
 
+                if (createBook.InitQuantity <= 0 || createBook.CurrentQuantity <= 0)
+                {
+                    return BadRequest("Quantity must be greater than zero");
+                }
+
                 var newBook = new Book()
                 {
                     BookName = createBook.BookName,
                     InitQuantity = createBook.InitQuantity,
                     CurrentQuantity = createBook.CurrentQuantity,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.MinValue,
                 };
 
                 _bookRepository.CreateBook(categoryId, newBook);
@@ -185,6 +192,13 @@ namespace BookManagement.App.Controllers
                 if (bookId != updateBook.Id)
                 {
                     return BadRequest("Id is not match");
+                }
+
+
+
+                if (updateBook.InitQuantity <= 0 || updateBook.CurrentQuantity <= 0)
+                {
+                    return BadRequest("Quantity must be greater than zero");
                 }
 
                 var bookMap = _mapper.Map<Book>(updateBook);
