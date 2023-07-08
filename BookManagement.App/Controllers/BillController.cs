@@ -156,5 +156,44 @@ namespace BookManagement.App.Controllers
                 });
             }
         }
+
+        [HttpPut("{billId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult UpdateBill([FromRoute] int billId, [FromBody] BillDto updateBill)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (billId != updateBill.Id)
+                {
+                    return BadRequest("Id is not match");
+                }
+
+                if (!_readerRepository.ReaderExists(updateBill.ReaderId))
+                {
+                    return NotFound("Reader is not exist");
+                }
+
+                var billMap = _mapper.Map<Bill>(updateBill);
+
+                _billRepository.UpdateBill(billMap);
+
+                return Ok("Updated successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while updating",
+                    Message = ex.Message,
+                });
+            }
+        }
     }
 }
