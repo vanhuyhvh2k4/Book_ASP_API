@@ -5,7 +5,5 @@
         public int Id { get; set; }
 
         public int ReaderId { get; set; }
-
-        public DateTime BorrowDate { get; set; }
     }
 }

@@ -53,7 +53,13 @@ namespace BookManagement.App.Repository
 
         public bool UpdateBill(Bill bill)
         {
-            _context.Bills.Update(bill);
+            var updateBill = _context.Bills.Find(bill.Id);
+
+            _context.Attach(updateBill);
+
+            updateBill.ReaderId = bill.ReaderId;
+            updateBill.UpdatedAt = DateTime.Now;
+
             return Save();
         }
     }

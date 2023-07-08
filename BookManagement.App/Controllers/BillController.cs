@@ -141,7 +141,9 @@ namespace BookManagement.App.Controllers
                 var newBill = new Bill()
                 {
                     ReaderId = createBill.ReaderId,
-                    BorrowDate = createBill.BorrowDate,
+                    BorrowDate = DateTime.Now,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.MinValue,
                 };
 
                 _billRepository.CreateBill(newBill);
