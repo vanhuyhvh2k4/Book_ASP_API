@@ -195,5 +195,39 @@ namespace BookManagement.App.Controllers
                 });
             }
         }
+
+        [HttpDelete("{billId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult DeleteBill([FromRoute] int billId)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var billToDelete = _billRepository.GetBill(billId);
+
+                if (billToDelete == null)
+                {
+                    return NotFound("Not Found Bill");
+                }
+
+                _billRepository.DeleteBill(billToDelete);
+
+                return Ok("Deleted successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while updating",
+                    Message = ex.Message,
+                });
+            }
+        }
     }
 }

@@ -24,6 +24,12 @@ namespace BookManagement.App.Repository
             return Save();
         }
 
+        public bool DeleteBill(Bill bill)
+        {
+            _context.Bills.Remove(bill);
+            return Save();
+        }
+
         public Bill GetBill(int billId)
         {
             return _context.Bills.Find(billId);
