@@ -215,6 +215,11 @@ namespace BookManagement.App.Controllers
                     return BadRequest("Id is not match");
                 }
 
+                if (!_billDetailRepository.BillDetailExists(billDetailId))
+                {
+                    return NotFound("Not Found Bill Detail");
+                }
+
                 if (!_bookRepository.BookExists(updateBillDetail.BookId))
                 {
                     return NotFound("Not Found Book");

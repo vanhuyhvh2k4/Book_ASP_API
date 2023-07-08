@@ -189,6 +189,11 @@ namespace BookManagement.App.Controllers
                     return BadRequest(ModelState);
                 }
 
+                if (!_bookRepository.BookExists(bookId))
+                {
+                    return NotFound("Not Found Book");
+                }
+
                 if (bookId != updateBook.Id)
                 {
                     return BadRequest("Id is not match");

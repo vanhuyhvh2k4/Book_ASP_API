@@ -178,6 +178,11 @@ namespace BookManagement.App.Controllers
                     return BadRequest("Id is not match");
                 }
 
+                if (!_billRepository.BillExists(billId))
+                {
+                    return NotFound("Not Found Bill");
+                }
+
                 if (!_readerRepository.ReaderExists(updateBill.ReaderId))
                 {
                     return NotFound("Reader is not exist");

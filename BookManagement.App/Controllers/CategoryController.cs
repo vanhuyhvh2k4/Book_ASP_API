@@ -176,6 +176,11 @@ namespace BookManagement.App.Controllers
                     return BadRequest(ModelState);
                 }
 
+                if (!_categoryRepository.CategoriesExists(categoryId))
+                {
+                    return NotFound("Not Found Category");
+                }
+
                 if (categoryId != updateCategory.Id)
                 {
                     return BadRequest("Id is not match");
