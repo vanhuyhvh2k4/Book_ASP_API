@@ -17,5 +17,7 @@ namespace BookManagement.App.Interfaces
         bool Save();
 
         bool UpdateReader(Reader reader);
+
+        bool DeleteReader(Reader reader);
     }
 }

@@ -19,6 +19,12 @@ namespace BookManagement.App.Repository
             return Save();
         }
 
+        public bool DeleteReader(Reader reader)
+        {
+            _context.Readers.Remove(reader);
+            return Save();
+        }
+
         public Reader GetReader(int readerId)
         {
             return _context.Readers.Find(readerId);

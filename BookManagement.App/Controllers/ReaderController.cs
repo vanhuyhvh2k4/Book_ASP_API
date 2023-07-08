@@ -188,5 +188,39 @@ namespace BookManagement.App.Controllers
             }
 
         }
+
+        [HttpDelete("{readerId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult DeleteReader([FromRoute] int readerId)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var readerToDelete = _readerRepository.GetReader(readerId);
+
+                if (readerToDelete == null)
+                {
+                    return NotFound("Not Found Reader");
+                }
+
+                _readerRepository.DeleteReader(readerToDelete);
+
+                return Ok("Deleted successfully");
+            } catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Title = "Something went wrong while updating",
+                    Message = ex.Message,
+                });
+            }
+        }
     }
 }
